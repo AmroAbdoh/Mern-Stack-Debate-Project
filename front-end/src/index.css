@@ -1,0 +1,18 @@
+:root {
+  --primary-bg-color: #e7ecef;
+  --secondary-bg-color: #a3cef1;
+  --primary-color: #6096ba;
+  --secondary-color: #274c77;
+}
+
+body {
+  box-sizing: border-box;
+  min-height: 100vh;
+  background-color: var(--primary-bg-color);
+  margin: 0;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-color);
+}

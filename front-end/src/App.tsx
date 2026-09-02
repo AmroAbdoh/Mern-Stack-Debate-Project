@@ -1,5 +1,7 @@
+import Auth from "./pages/LandingPage/LandingPage";
+
 function App() {
-  return <h1>Hello world</h1>;
+  return <Auth />;
 }
 
 export default App;

@@ -1,5 +1,6 @@
 const express = require("express");
 const authRoutes = require("./routes/authRoutes");
+const debateSessionRoutes = require("./routes/debateSessionRoutes");
 const cors = require("cors");
 
 const app = express();
@@ -15,6 +16,9 @@ app.get("/", (req, res) => {
 
 // Authentication
 app.use("/api/auth", authRoutes);
+
+// Debate Session
+app.use("/api/sessions", debateSessionRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);

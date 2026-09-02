@@ -1,0 +1,217 @@
+main {
+  box-sizing: border-box;
+  position: relative;
+  width: min(100%, 900px);
+  min-height: 500px;
+  margin: 0;
+  padding: 72px 64px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  overflow: hidden;
+  color: var(--secondary-color);
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid rgba(96, 150, 186, 0.35);
+  border-radius: 20px;
+  box-shadow: 0 18px 45px rgba(39, 76, 119, 0.16);
+}
+
+main::before {
+  content: "DEBATE ROOM";
+  position: absolute;
+  inset: 0 0 auto;
+  padding: 10px;
+  color: var(--primary-bg-color);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  background: var(--secondary-color);
+}
+
+main h1 {
+  margin: 0;
+  color: var(--secondary-color);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  line-height: 1.1;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.intro {
+  max-width: 420px;
+  margin: 4px 0 28px;
+  color: #8b8c89;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.action-grid {
+  width: min(100%, 720px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.action-card {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 210px;
+  padding: 30px;
+  display: flex;
+  align-items: flex-start;
+  align-content: stretch;
+  text-align: left;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(39, 76, 119, 0.08);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.action-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(39, 76, 119, 0.14);
+}
+
+.host-card {
+  position: relative;
+  overflow: hidden;
+  color: var(--primary-bg-color);
+  background: var(--secondary-color);
+}
+
+.host-card::after {
+  content: "";
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  right: -55px;
+  bottom: -55px;
+  background: rgba(163, 206, 241, 0.18);
+  border-radius: 50%;
+}
+
+.join-card {
+  color: var(--secondary-color);
+  background: var(--primary-bg-color);
+  border: 1px solid #a3cef1;
+}
+
+.action-card h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.host-card,
+.join-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.action-card a {
+  grid-row: 3;
+  padding: 10px 16px;
+  color: var(--secondary-color);
+  font-weight: 700;
+  background: var(--secondary-bg-color);
+  border-radius: 8px;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.action-card a:hover {
+  background: var(--primary-bg-color);
+}
+
+.action-card label {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: var(--secondary-color);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.join-controls {
+  grid-row: 3;
+  width: 100%;
+  display: flex;
+  gap: 8px;
+}
+
+main input {
+  min-width: 0;
+  flex: 1;
+  padding: 14px 16px;
+  color: var(--secondary-color);
+  font: inherit;
+  background: var(--primary-bg-color);
+  border: 1px solid #a3cef1;
+  border-radius: 10px;
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+main input::placeholder {
+  color: #8b8c89;
+}
+
+main input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(96, 150, 186, 0.2);
+}
+
+main button {
+  padding: 14px 22px;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--primary-color);
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+main button:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 560px) {
+  main {
+    width: calc(100% - 32px);
+    min-height: auto;
+    padding: 52px 20px 24px;
+  }
+
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-card {
+    min-height: 190px;
+    padding: 24px;
+  }
+
+  .action-card label {
+    margin-top: 0;
+  }
+}
