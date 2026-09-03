@@ -1,8 +1,9 @@
 import "./auth.css";
+import PageCard from "../../components/PageCard/PageCard";
 
 function LandingPage() {
   return (
-    <main>
+    <PageCard className="landing-card">
       <p className="eyebrow">Welcome to</p>
       <h1>Debate Room</h1>
       <p className="intro">
@@ -12,12 +13,12 @@ function LandingPage() {
       <div className="action-grid">
         <section className="action-card host-card">
           <h2>Host a debate</h2>
-          
-          <a href="#host">Become a host</a>
+
+          <a href="/auth">Become a host</a>
         </section>
 
         <section className="action-card join-card">
-          <h2>Join a debate</h2>          
+          <h2>Join a debate</h2>
 
           <div className="join-controls">
             <input
@@ -30,7 +31,7 @@ function LandingPage() {
           </div>
         </section>
       </div>
-    </main>
+    </PageCard>
   );
 }
 
