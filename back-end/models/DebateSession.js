@@ -1,8 +1,21 @@
-
 const mongoose = require("mongoose");
+const crypto = require("crypto");
+
+const generateSessionCode = () =>
+  crypto.randomBytes(4).toString("base64url").toUpperCase().slice(0, 6);
 
 const DebateSessionSchema = new mongoose.Schema(
   {
+    code: {
+      type: String,
+      unique: true,
+      uppercase: true,
+      default: generateSessionCode,
+      minlength: 6,
+      maxlength: 6,
+      index: true,
+    },
+
     name: {
       type: String,
       required: true,
@@ -70,8 +83,35 @@ const DebateSessionSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["scheduled", "live", "paused", "finished", "cancelled"],
+      enum: [
+        "scheduled",
+        "waiting",
+        "pre-voting",
+        "live",
+        "paused",
+        "post-voting",
+        "finished",
+        "cancelled",
+      ],
       default: "scheduled",
+    },
+
+    startedAt: Date,
+    endedAt: Date,
+    phaseStartedAt: Date,
+    phaseEndsAt: Date,
+    pausedAt: Date,
+    currentPhase: {
+      type: String,
+      enum: ["pre-voting", "debate", "post-voting"],
+    },
+    currentPhaseIndex: {
+      type: Number,
+      min: 0,
+    },
+    activeTeam: {
+      type: String,
+      enum: ["teamOne", "teamTwo"],
     },
 
     settings: {
@@ -110,6 +150,20 @@ const DebateSessionSchema = new mongoose.Schema(
           min: 1,
         },
 
+        durationSeconds: {
+          type: Number,
+          min: 1,
+          default: function () {
+            return this.duration ? this.duration * 60 : 180;
+          },
+        },
+
+        timingMode: {
+          type: String,
+          enum: ["per-team", "shared"],
+          default: "per-team",
+        },
+
         order: {
           type: Number,
           required: true,
@@ -119,7 +173,7 @@ const DebateSessionSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 module.exports = mongoose.model("DebateSession", DebateSessionSchema);

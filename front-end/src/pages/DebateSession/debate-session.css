@@ -40,6 +40,55 @@
   line-height: 1.5;
 }
 
+.session-edit-form {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.session-edit-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.session-select-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: var(--secondary-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.session-select-field select,
+.session-select-field input {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: var(--secondary-color);
+  font: inherit;
+  background: #f5f8fa;
+  border: 1px solid #a3cef1;
+  border-radius: 9px;
+  outline: none;
+}
+
+.edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.edit-actions .button-primary {
+  padding: 11px 16px;
+}
+
+.edit-actions .button-ghost {
+  color: var(--primary-color);
+}
+
 .format-badge {
   padding: 10px 14px;
   color: var(--secondary-color);
@@ -104,6 +153,45 @@
   font-size: 1.1rem;
 }
 
+.team-edit-form {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.team-edit-form .input-field label,
+.team-member-edit-heading {
+  color: var(--primary-bg-color);
+}
+
+.team-member-edit-heading {
+  margin: 18px 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.add-team-member {
+  padding: 4px 0;
+  color: var(--secondary-bg-color);
+  font-size: 0.75rem;
+}
+
+.team-member-input {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.remove-team-member {
+  position: absolute;
+  right: 8px;
+  bottom: 10px;
+  padding: 4px;
+  color: #f0b4b4;
+  font-size: 0.7rem;
+}
+
 .member-list {
   margin: 14px 0 0;
   padding: 12px 0 0 18px;
@@ -142,9 +230,19 @@
 .session-message {
   margin: 20px 0 0;
   padding: 12px;
+  border-radius: 8px;
+}
+
+.session-message-success {
+  color: #356b4a;
+  background: #e7f3eb;
+  border: 1px solid #b7d9c1;
+}
+
+.session-message-error {
+  color: #8b3a3a;
   background: #f8e7e7;
   border: 1px solid #e6baba;
-  border-radius: 8px;
 }
 
 .session-actions {
@@ -159,7 +257,9 @@
 }
 
 .cancel-button {
+  padding: 11px 16px;
   color: #8b3a3a;
+  background: #f8e7e7;
   border: 1px solid #e6baba;
   border-radius: 8px;
 }
@@ -181,6 +281,10 @@
 
   .session-details,
   .teams-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .session-edit-row {
     grid-template-columns: 1fr;
   }
 }

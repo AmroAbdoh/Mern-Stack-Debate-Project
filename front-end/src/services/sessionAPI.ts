@@ -42,6 +42,11 @@ export type CreateSessionRequest = {
   startTime: string;
 };
 
+export type UpdateSessionRequest = Pick<
+  CreateSessionRequest,
+  "name" | "statement" | "format" | "startTime" | "teams"
+>;
+
 const authHeaders = () => ({
   Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
 });
@@ -70,6 +75,19 @@ export const getSession = async (id: string) => {
     {
       headers: authHeaders(),
     },
+  );
+
+  return response.data.session;
+};
+
+export const updateSession = async (
+  id: string,
+  payload: UpdateSessionRequest,
+) => {
+  const response = await api.patch<{ session: DebateSession }>(
+    `/sessions/${id}`,
+    payload,
+    { headers: authHeaders() },
   );
 
   return response.data.session;
