@@ -1,5 +1,8 @@
 import "./auth.css";
 import PageCard from "../../components/PageCard/PageCard";
+import InputField from "../../components/InputField/Input";
+import Button from "../../components/Button/Button";
+import { Link } from "react-router-dom";
 
 function LandingPage() {
   return (
@@ -14,20 +17,19 @@ function LandingPage() {
         <section className="action-card host-card">
           <h2>Host a debate</h2>
 
-          <a href="/auth">Become a host</a>
+          <Link to="/auth">Become a host</Link>
         </section>
 
         <section className="action-card join-card">
           <h2>Join a debate</h2>
 
           <div className="join-controls">
-            <input
-              id="session-code"
-              type="text"
+            <InputField
+              label="Session code"
+              name="session-code"
               placeholder="e.g. DEB-204"
-              autoComplete="off"
             />
-            <button type="button">Join</button>
+            <Button type="button">Join</Button>
           </div>
         </section>
       </div>

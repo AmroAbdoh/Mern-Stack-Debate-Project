@@ -23,3 +23,23 @@ export type ForgotPasswordRequest = {
   email: string;
   newPassword: string;
 };
+
+export const loginUser = async (payload: AuthRequest) => {
+  const response = await api.post<AuthResponse>("/auth/login", payload);
+  return response.data;
+};
+
+
+export const registerUser = async (payload: AuthRequest) => {
+  const response = await api.post<AuthResponse>("/auth/register", payload);
+  return response.data;
+};
+
+
+export const forgetPasswordUser = async (payload: ForgotPasswordRequest) => {
+  const response = await api.patch<{ message: string }>(
+    "/auth/forgetPassword",
+    payload,
+  );
+  return response.data;
+};

@@ -138,7 +138,13 @@
   grid-row: 3;
   width: 100%;
   display: flex;
+  align-items: flex-end;
   gap: 8px;
+}
+
+.join-controls .input-field {
+  min-width: 0;
+  flex: 1;
 }
 
 .landing-card input {

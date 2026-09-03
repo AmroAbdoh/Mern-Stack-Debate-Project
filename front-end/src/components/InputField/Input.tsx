@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent } from "react";
 import "./input.css";
+import Button from "../Button/Button";
 
 interface InputFieldProps {
   label: string;
@@ -21,8 +22,7 @@ function InputField({
   showPasswordToggle = false,
 }: InputFieldProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const inputType =
-    type === "password" && isPasswordVisible ? "text" : type;
+  const inputType = type === "password" && isPasswordVisible ? "text" : type;
 
   return (
     <div className="input-field">
@@ -37,14 +37,15 @@ function InputField({
           onChange={onChange}
         />
         {type === "password" && showPasswordToggle && (
-          <button
+          <Button
             className="password-toggle"
+            variant="ghost"
             type="button"
             aria-label={isPasswordVisible ? "Hide password" : "Show password"}
             onClick={() => setIsPasswordVisible((current) => !current)}
           >
             {isPasswordVisible ? "Hide" : "Show"}
-          </button>
+          </Button>
         )}
       </div>
     </div>

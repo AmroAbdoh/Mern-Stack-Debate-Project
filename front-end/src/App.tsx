@@ -1,8 +1,8 @@
-import Auth from "./pages/LandingPage/LandingPage";
-import AuthPage from "./pages/Auth/Auth";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router/router";
 
 function App() {
-  return window.location.pathname === "/auth" ? <AuthPage /> : <Auth />;
+  return <RouterProvider router={router} />;
 }
 
 export default App;

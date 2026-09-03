@@ -2,21 +2,20 @@ import "./auth.css";
 import PageCard from "../../components/PageCard/PageCard";
 import InputField from "../../components/InputField/Input";
 import { useState, type ChangeEvent } from "react";
-import { loginUser, registerUser } from "../../services/authAPI";
-import { useNavigate } from "react-router-dom";
+import { forgetPasswordUser } from "../../services/authAPI";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Button from "../../components/Button/Button";
 
-function Auth() {
+function ForgetPassword() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isLogin, setIsLogin] = useState(true);
+
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
-    password: "",
+    newPassword: "",
   });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -55,49 +54,29 @@ function Auth() {
     setErrorMessage("");
     setSuccessMessage("");
 
-    const payload = isLogin
-      ? { email: formData.email, password: formData.password }
-      : {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        };
+    const payload = {
+      email: formData.email,
+      newPassword: formData.newPassword,
+    };
 
     try {
       setIsSubmitting(true);
 
-      const response = isLogin
-        ? await loginUser(payload)
-        : await registerUser(payload);
+      await forgetPasswordUser(payload);
 
-      if (isLogin) {
-        localStorage.setItem("token", response.token);
-        localStorage.setItem("userName", response.user.name);
-        localStorage.setItem("userEmail", response.user.email);
-        localStorage.setItem("userRole", response.user.role || "host");
-        navigate("/");
-      } else {
-        setSuccessMessage(
-          "Your account was created successfully. Please sign in.",
-        );
-        setIsLogin(true);
-        setFormData({ name: "", email: "", password: "" });
-      }
+      navigate("/");
+
+      setFormData({ email: "", newPassword: "" });
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
   };
-
   return (
     <PageCard className="auth-card">
-      <h1>{isLogin ? "Welcome back" : "Create your account"}</h1>
-      <p className="auth-intro">
-        {isLogin
-          ? "Sign in to host debates and join your next discussion."
-          : "Set up your account and start leading better discussions."}
-      </p>
+      <h1>Reset Password</h1>
+      <p className="auth-intro">Enter Your Email and your new password</p>
 
       {errorMessage && <p className="auth-error">{errorMessage}</p>}
       {successMessage && (
@@ -107,15 +86,6 @@ function Auth() {
       )}
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        {!isLogin && (
-          <InputField
-            label="Name"
-            name="name"
-            value={formData.name}
-            placeholder="Your name"
-            onChange={handleChange}
-          />
-        )}
         <InputField
           label="Email"
           type="email"
@@ -128,39 +98,23 @@ function Auth() {
           label="Password"
           type="password"
           name="password"
-          value={formData.password}
+          value={formData.newPassword}
           placeholder="Enter your password"
           showPasswordToggle
           onChange={handleChange}
         />
-        {isLogin && (
-          <a className="forgot-password" href="/forgot-password">
-            Forgot password?
-          </a>
-        )}
+
         <Button className="auth-submit" type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? "Please wait..."
-            : isLogin
-              ? "Sign in"
-              : "Create account"}
+          {isSubmitting ? "Please wait..." : "Reset Password"}
         </Button>
       </form>
 
       <div className="auth-switch">
-        <span>
-          {isLogin ? "New to Debate Room?" : "Already have an account?"}
-        </span>
-        <Button
-          variant="ghost"
-          type="button"
-          onClick={() => setIsLogin((current) => !current)}
-        >
-          {isLogin ? "Create an account" : "Sign in instead"}
-        </Button>
+        <span>Remembered Your Password?</span>
+        <Link to="/auth">Login</Link>
       </div>
     </PageCard>
   );
 }
 
-export default Auth;
+export default ForgetPassword;
