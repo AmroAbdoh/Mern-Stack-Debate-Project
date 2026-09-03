@@ -155,8 +155,8 @@ const cancelSession = async (req, res) => {
 
 module.exports = {
   createSession,
-  getSession,
   getSessions,
+  getSession,
   updateSession,
   startSession,
   pauseSession,

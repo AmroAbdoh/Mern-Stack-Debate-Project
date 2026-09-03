@@ -75,7 +75,7 @@ function Auth() {
         localStorage.setItem("userName", response.user.name);
         localStorage.setItem("userEmail", response.user.email);
         localStorage.setItem("userRole", response.user.role || "host");
-        navigate("/");
+        navigate("/home");
       } else {
         setSuccessMessage(
           "Your account was created successfully. Please sign in.",

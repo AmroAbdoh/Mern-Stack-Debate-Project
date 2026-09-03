@@ -3,8 +3,15 @@ import PageCard from "../../components/PageCard/PageCard";
 import InputField from "../../components/InputField/Input";
 import Button from "../../components/Button/Button";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function LandingPage() {
+  const navigate = useNavigate();
+
+  const handleJoin = () => {
+    navigate(localStorage.getItem("token") ? "/home" : "/auth");
+  };
+
   return (
     <PageCard className="landing-card">
       <p className="eyebrow">Welcome to</p>
@@ -29,7 +36,9 @@ function LandingPage() {
               name="session-code"
               placeholder="e.g. DEB-204"
             />
-            <Button type="button">Join</Button>
+            <Button type="button" onClick={handleJoin}>
+              Join
+            </Button>
           </div>
         </section>
       </div>

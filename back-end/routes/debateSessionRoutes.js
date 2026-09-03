@@ -3,6 +3,7 @@ const router = express.Router();
 
 const {
   createSession,
+  getSessions,
   getSession,
   updateSession,
   startSession,
@@ -14,7 +15,8 @@ const {
 const authenticateUser = require("../middleware/authentication");
 
 router.post("/", authenticateUser, createSession);
-router.get("/:id", getSession);
+router.get("/", authenticateUser, getSessions);
+router.get("/:id", authenticateUser, getSession);
 router.patch("/:id", authenticateUser, updateSession);
 router.patch("/:id/start", authenticateUser, startSession);
 router.patch("/:id/pause", authenticateUser, pauseSession);

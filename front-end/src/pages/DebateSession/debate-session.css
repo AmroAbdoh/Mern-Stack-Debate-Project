@@ -1,0 +1,186 @@
+.session-page {
+  width: min(100% - 32px, 900px);
+  min-height: auto;
+  padding: 42px 48px;
+}
+
+.back-link {
+  color: var(--primary-color);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--secondary-color);
+}
+
+.session-header {
+  margin-top: 34px;
+  padding-bottom: 30px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid #d9e4eb;
+}
+
+.session-header h1 {
+  margin: 10px 0 12px;
+  color: var(--secondary-color);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  line-height: 1;
+}
+
+.session-header p {
+  max-width: 600px;
+  margin: 0;
+  color: #8b8c89;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.format-badge {
+  padding: 10px 14px;
+  color: var(--secondary-color);
+  font-size: 0.8rem;
+  font-weight: 800;
+  background: var(--secondary-bg-color);
+  border-radius: 8px;
+}
+
+.status {
+  color: var(--primary-color);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.session-details {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 20px;
+}
+
+.session-section {
+  padding: 24px;
+  background: #f5f8fa;
+  border: 1px solid #d9e4eb;
+  border-radius: 12px;
+}
+
+.section-label {
+  margin: 0 0 18px;
+  color: var(--primary-color);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.team-card {
+  padding: 18px;
+  color: #ffffff;
+  background: var(--secondary-color);
+  border-radius: 10px;
+}
+
+.team-card span {
+  color: var(--secondary-bg-color);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.team-card h2 {
+  margin: 12px 0 0;
+  font-size: 1.1rem;
+}
+
+.member-list {
+  margin: 14px 0 0;
+  padding: 12px 0 0 18px;
+  color: rgba(231, 236, 239, 0.78);
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(163, 206, 241, 0.25);
+}
+
+.member-list li + li {
+  margin-top: 6px;
+}
+
+.meta-row {
+  padding: 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-top: 1px solid #d9e4eb;
+}
+
+.meta-row span {
+  color: #8b8c89;
+  font-size: 0.8rem;
+}
+
+.meta-row strong {
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+}
+
+.session-message,
+.session-page-state {
+  color: var(--secondary-color);
+}
+
+.session-message {
+  margin: 20px 0 0;
+  padding: 12px;
+  background: #f8e7e7;
+  border: 1px solid #e6baba;
+  border-radius: 8px;
+}
+
+.session-actions {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.session-actions .button-primary {
+  padding: 13px 20px;
+}
+
+.cancel-button {
+  color: #8b3a3a;
+  border: 1px solid #e6baba;
+  border-radius: 8px;
+}
+
+.cancel-button:hover {
+  color: #ffffff;
+  background: #8b3a3a;
+}
+
+@media (max-width: 700px) {
+  .session-page {
+    padding: 32px 24px;
+  }
+
+  .session-header,
+  .session-actions {
+    flex-direction: column;
+  }
+
+  .session-details,
+  .teams-grid {
+    grid-template-columns: 1fr;
+  }
+}
