@@ -4,6 +4,8 @@ import ForgetPassword from "../pages/Auth/ForgetPassword";
 import LandingPage from "../pages/LandingPage/LandingPage";
 import Home from "../pages/Home/Home";
 import RequireAuth from "../components/RequireAuth/RequireAuth";
+import SessionControl from "../pages/SessionControl/SessionControl";
+import JoinSession from "../pages/JoinSession/JoinSession";
 import DebateSession from "../pages/DebateSession/DebateSession";
 
 export const router = createBrowserRouter([
@@ -32,6 +34,22 @@ export const router = createBrowserRouter([
     element: (
       <RequireAuth>
         <DebateSession />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: "/sessions/:id/control",
+    element: (
+      <RequireAuth>
+        <SessionControl />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: "/join/:code",
+    element: (
+      <RequireAuth>
+        <JoinSession />
       </RequireAuth>
     ),
   },
