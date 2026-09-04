@@ -83,7 +83,7 @@ const activateScheduledSessions = async () => {
     session.currentPhase = isPreVoting ? "pre-voting" : "debate";
     session.startedAt = now;
     session.phaseStartedAt = now;
-    session.phaseEndsAt = isPreVoting ? undefined : undefined;
+    session.phaseEndsAt = undefined;
 
     if (!isPreVoting && !startDebatePhase(session, 0, now)) {
       finishDebate(session, now);
@@ -106,85 +106,8 @@ const advanceActiveSessions = async () => {
   }
 };
 
-const createSession = async (req, res) => {
-  const session = await DebateSession.create({
-    ...req.body,
-    host: req.user.userId,
-  });
-
-  res.status(StatusCodes.CREATED).json({
-    session,
-  });
-};
-
-const getSessions = async (req, res) => {
-  const sessions = await DebateSession.find({ host: req.user.userId })
-    .sort({ startTime: 1 })
-    .lean();
-
-  res.status(StatusCodes.OK).json({ sessions });
-};
-
-const getSession = async (req, res) => {
-  const { id } = req.params;
-
-  const session = await DebateSession.findById(id);
-
-  if (!session) {
-    return res.status(StatusCodes.NOT_FOUND).json({
-      message: "Debate session not found",
-    });
-  }
-
-  res.status(StatusCodes.OK).json({
-    session,
-  });
-};
-
-const getSessionByCode = async (req, res) => {
-  const session = await DebateSession.findOne({
-    code: req.params.code.toUpperCase(),
-  });
-
-  if (!session) {
-    return res.status(StatusCodes.NOT_FOUND).json({
-      message: "Debate session not found",
-    });
-  }
-
-  res.status(StatusCodes.OK).json({ session });
-};
-
-const updateSession = async (req, res) => {
-  const { id } = req.params;
-
-  const session = await DebateSession.findById(id);
-
-  if (!session) {
-    return res.status(StatusCodes.NOT_FOUND).json({
-      message: "Debate session not found",
-    });
-  }
-
-  if (session.host.toString() !== req.user.userId) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "You are not allowed to modify this session",
-    });
-  }
-
-  const updatedSession = await DebateSession.findByIdAndUpdate(id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  res.status(StatusCodes.OK).json({
-    session: updatedSession,
-  });
-};
-
 const startSession = async (req, res) => {
   const session = await findSessionById(req.params.id);
-
   checkSessionHost(session, req.user.userId);
 
   if (session.status !== "scheduled") {
@@ -194,22 +117,20 @@ const startSession = async (req, res) => {
   }
 
   const now = new Date();
-  session.status = session.settings.preDebateVoting ? "pre-voting" : "live";
-  session.currentPhase = session.settings.preDebateVoting
-    ? "pre-voting"
-    : "debate";
+  const isPreVoting = session.settings.preDebateVoting;
+  session.status = isPreVoting ? "pre-voting" : "live";
+  session.currentPhase = isPreVoting ? "pre-voting" : "debate";
   session.startedAt = now;
   session.phaseStartedAt = now;
-  if (!session.settings.preDebateVoting && !startDebatePhase(session, 0, now)) {
+
+  if (!isPreVoting && !startDebatePhase(session, 0, now)) {
     finishDebate(session, now);
   }
 
   await session.save();
-
-  res.status(StatusCodes.OK).json({
-    message: "Debate session started",
-    session,
-  });
+  res
+    .status(StatusCodes.OK)
+    .json({ message: "Debate session started", session });
 };
 
 const beginVoting = async (req, res) => {
@@ -239,14 +160,13 @@ const endVoting = async (req, res) => {
   checkSessionHost(session, req.user.userId);
 
   if (session.status !== "pre-voting") {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ message: "Pre-debate voting is not active" });
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      message: "Pre-debate voting is not active",
+    });
   }
 
-  if (!startDebatePhase(session, 0, new Date())) {
-    finishDebate(session, new Date());
-  }
+  const now = new Date();
+  if (!startDebatePhase(session, 0, now)) finishDebate(session, now);
   await session.save();
 
   res
@@ -259,19 +179,17 @@ const endDebate = async (req, res) => {
   checkSessionHost(session, req.user.userId);
 
   if (session.status !== "live" && session.status !== "paused") {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ message: "The debate is not active" });
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      message: "The debate is not active",
+    });
   }
 
-  session.status = session.settings.postDebateVoting
-    ? "post-voting"
-    : "finished";
-  session.currentPhase = session.settings.postDebateVoting
-    ? "post-voting"
-    : undefined;
-  session.phaseStartedAt = new Date();
-  session.endedAt = session.settings.postDebateVoting ? undefined : new Date();
+  const now = new Date();
+  const hasPostVoting = session.settings.postDebateVoting;
+  session.status = hasPostVoting ? "post-voting" : "finished";
+  session.currentPhase = hasPostVoting ? "post-voting" : undefined;
+  session.phaseStartedAt = now;
+  session.endedAt = hasPostVoting ? undefined : now;
   await session.save();
 
   res.status(StatusCodes.OK).json({ message: "Debate ended", session });
@@ -282,9 +200,9 @@ const endPostVoting = async (req, res) => {
   checkSessionHost(session, req.user.userId);
 
   if (session.status !== "post-voting") {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ message: "Post-debate voting is not active" });
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      message: "Post-debate voting is not active",
+    });
   }
 
   session.status = "finished";
@@ -297,7 +215,6 @@ const endPostVoting = async (req, res) => {
 
 const pauseSession = async (req, res) => {
   const session = await findSessionById(req.params.id);
-
   checkSessionHost(session, req.user.userId);
 
   if (session.status !== "live") {
@@ -308,19 +225,15 @@ const pauseSession = async (req, res) => {
 
   session.status = "paused";
   session.pausedAt = new Date();
-
   await session.save();
 
-  res.status(StatusCodes.OK).json({
-    message: "Debate session paused",
-    session,
-  });
+  res
+    .status(StatusCodes.OK)
+    .json({ message: "Debate session paused", session });
 };
 
-// Resume debate
 const resumeSession = async (req, res) => {
   const session = await findSessionById(req.params.id);
-
   checkSessionHost(session, req.user.userId);
 
   if (session.status !== "paused") {
@@ -330,27 +243,21 @@ const resumeSession = async (req, res) => {
   }
 
   session.status = "live";
-
   if (session.pausedAt && session.phaseEndsAt) {
     session.phaseEndsAt = new Date(
       session.phaseEndsAt.getTime() + (Date.now() - session.pausedAt.getTime()),
     );
   }
-
   session.pausedAt = undefined;
-
   await session.save();
 
-  res.status(StatusCodes.OK).json({
-    message: "Debate session resumed",
-    session,
-  });
+  res
+    .status(StatusCodes.OK)
+    .json({ message: "Debate session resumed", session });
 };
 
-// Cancel debate
 const cancelSession = async (req, res) => {
   const session = await findSessionById(req.params.id);
-
   checkSessionHost(session, req.user.userId);
 
   if (["finished", "cancelled"].includes(session.status)) {
@@ -360,21 +267,14 @@ const cancelSession = async (req, res) => {
   }
 
   session.status = "cancelled";
-
   await session.save();
 
-  res.status(StatusCodes.OK).json({
-    message: "Debate session cancelled",
-    session,
-  });
+  res
+    .status(StatusCodes.OK)
+    .json({ message: "Debate session cancelled", session });
 };
 
 module.exports = {
-  createSession,
-  getSessions,
-  getSession,
-  getSessionByCode,
-  updateSession,
   startSession,
   pauseSession,
   resumeSession,

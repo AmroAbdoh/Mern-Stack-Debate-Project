@@ -37,23 +37,45 @@ export type DebateSession = {
     postDebateVoting: boolean;
     autoShowResults: boolean;
   };
-  phases?: { name: string; duration: number; order: number }[];
+  phases?: {
+    name: string;
+    duration: number;
+    durationSeconds?: number;
+    timingMode: "per-team" | "shared";
+    order: number;
+  }[];
 };
 
 export type CreateSessionRequest = {
   name: string;
   statement: string;
   format: "PF" | "LD";
+
   teams: [
     { name: string; members: { name: string }[] },
     { name: string; members: { name: string }[] },
   ];
+
   startTime: string;
+
+  settings: {
+    allowAbstain: boolean;
+    preDebateVoting: boolean;
+    postDebateVoting: boolean;
+    autoShowResults: boolean;
+  };
+
+  phases: {
+    name: string;
+    duration: number;
+    timingMode: "per-team" | "shared";
+    order: number;
+  }[];
 };
 
 export type UpdateSessionRequest = Pick<
   CreateSessionRequest,
-  "name" | "statement" | "format" | "startTime" | "teams"
+  "name" | "statement" | "format" | "startTime" | "teams" | "settings" | "phases"
 >;
 
 const authHeaders = () => ({

@@ -1,15 +1,15 @@
 import "./home.css";
 import PageCard from "../../components/PageCard/PageCard";
-import InputField from "../../components/InputField/Input";
 import Button from "../../components/Button/Button";
-import { useEffect, useState, type ChangeEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import SessionForm from "../../components/SessionForm/SessionForm";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Link } from "react-router-dom";
 import {
   createSession,
   getSessions,
   type DebateSession,
+  type CreateSessionRequest,
 } from "../../services/sessionAPI";
 
 function Home() {
@@ -18,16 +18,6 @@ function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
-  const [formData, setFormData] = useState({
-    name: "",
-    statement: "",
-    format: "PF" as "PF" | "LD",
-    teamOne: "",
-    teamTwo: "",
-    teamOneMembers: [""],
-    teamTwoMembers: [""],
-    startTime: "",
-  });
 
   useEffect(() => {
     const loadSessions = async () => {
@@ -39,102 +29,33 @@ function Home() {
         setIsLoading(false);
       }
     };
-
     void loadSessions();
   }, []);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData((current) => ({ ...current, [name]: value }));
-  };
-
-  const updateMember = (
-    team: "teamOneMembers" | "teamTwoMembers",
-    index: number,
-    value: string,
-  ) => {
-    setFormData((current) => ({
-      ...current,
-      [team]: current[team].map((member, memberIndex) =>
-        memberIndex === index ? value : member,
-      ),
-    }));
-  };
-
-  const addMember = (team: "teamOneMembers" | "teamTwoMembers") => {
-    setFormData((current) => ({
-      ...current,
-      [team]: [...current[team], ""],
-    }));
-  };
-
-  const removeMember = (
-    team: "teamOneMembers" | "teamTwoMembers",
-    index: number,
-  ) => {
-    setFormData((current) => ({
-      ...current,
-      [team]: current[team].filter((_, memberIndex) => memberIndex !== index),
-    }));
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setMessage("");
+  const handleCreate = async (payload: CreateSessionRequest) => {
     setIsSubmitting(true);
-
+    setMessage("");
     try {
-      const session = await createSession({
-        name: formData.name,
-        statement: formData.statement,
-        format: formData.format,
-        teams: [
-          {
-            name: formData.teamOne,
-            members: formData.teamOneMembers
-              .filter((member) => member.trim())
-              .map((name) => ({ name: name.trim() })),
-          },
-          {
-            name: formData.teamTwo,
-            members: formData.teamTwoMembers
-              .filter((member) => member.trim())
-              .map((name) => ({ name: name.trim() })),
-          },
-        ],
-        startTime: formData.startTime,
-      });
-
+      const session = await createSession(payload);
       setSessions((current) => [...current, session]);
-      setFormData({
-        name: "",
-        statement: "",
-        format: "PF",
-        teamOne: "",
-        teamTwo: "",
-        teamOneMembers: [""],
-        teamTwoMembers: [""],
-        startTime: "",
-      });
       setMessage("Your debate session was created successfully.");
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
-        setMessage(error.response.data.message);
-      } else {
-        setMessage(
+      const serverMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message
+        : undefined;
+      setMessage(
+        serverMessage ||
           "We could not create the session. Please check your details.",
-        );
-      }
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userRole");
+    ["token", "userName", "userEmail", "userRole"].forEach((key) =>
+      localStorage.removeItem(key),
+    );
     navigate("/", { replace: true });
   };
 
@@ -168,171 +89,21 @@ function Home() {
             <span>01</span>
             <h2>Create a debate session</h2>
           </div>
-
-          <form className="session-form" onSubmit={handleSubmit}>
-            <InputField
-              label="Session name"
-              name="name"
-              value={formData.name}
-              placeholder="e.g. Future of remote work"
-              onChange={handleChange}
-            />
-            <InputField
-              label="Debate statement"
-              name="statement"
-              value={formData.statement}
-              placeholder="e.g. Remote work should be the default"
-              onChange={handleChange}
-            />
-
-            <div className="form-row">
-              <label className="select-field">
-                Format
-                <select
-                  name="format"
-                  value={formData.format}
-                  onChange={(event) =>
-                    setFormData((current) => ({
-                      ...current,
-                      format: event.target.value as "PF" | "LD",
-                    }))
-                  }
-                >
-                  <option value="PF">Public Forum</option>
-                  <option value="LD">Lincoln-Douglas</option>
-                </select>
-              </label>
-              <label className="select-field">
-                Start time
-                <input
-                  name="startTime"
-                  type="datetime-local"
-                  value={formData.startTime}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-            </div>
-
-            <div className="team-fields">
-              <InputField
-                label="Team one"
-                name="teamOne"
-                value={formData.teamOne}
-                placeholder="Affirmative"
-                onChange={handleChange}
-              />
-              <InputField
-                label="Team two"
-                name="teamTwo"
-                value={formData.teamTwo}
-                placeholder="Negative"
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="members-fields">
-              <div className="member-group">
-                <div className="member-heading">
-                  <span>Team one members</span>
-                  <Button
-                    className="add-member-button"
-                    variant="ghost"
-                    type="button"
-                    onClick={() => addMember("teamOneMembers")}
-                  >
-                    + Add member
-                  </Button>
-                </div>
-                {formData.teamOneMembers.map((member, index) => (
-                  <div className="member-input" key={`team-one-${index}`}>
-                    <InputField
-                      label={`Member ${index + 1}`}
-                      name={`team-one-member-${index}`}
-                      value={member}
-                      placeholder="Member name"
-                      onChange={(event) =>
-                        updateMember(
-                          "teamOneMembers",
-                          index,
-                          event.target.value,
-                        )
-                      }
-                    />
-                    {formData.teamOneMembers.length > 1 && (
-                      <Button
-                        className="remove-member-button"
-                        variant="ghost"
-                        type="button"
-                        aria-label={`Remove team one member ${index + 1}`}
-                        onClick={() => removeMember("teamOneMembers", index)}
-                      >
-                        Remove
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="member-group">
-                <div className="member-heading">
-                  <span>Team two members</span>
-                  <Button
-                    className="add-member-button"
-                    variant="ghost"
-                    type="button"
-                    onClick={() => addMember("teamTwoMembers")}
-                  >
-                    + Add member
-                  </Button>
-                </div>
-                {formData.teamTwoMembers.map((member, index) => (
-                  <div className="member-input" key={`team-two-${index}`}>
-                    <InputField
-                      label={`Member ${index + 1}`}
-                      name={`team-two-member-${index}`}
-                      value={member}
-                      placeholder="Member name"
-                      onChange={(event) =>
-                        updateMember(
-                          "teamTwoMembers",
-                          index,
-                          event.target.value,
-                        )
-                      }
-                    />
-                    {formData.teamTwoMembers.length > 1 && (
-                      <Button
-                        className="remove-member-button"
-                        variant="ghost"
-                        type="button"
-                        aria-label={`Remove team two member ${index + 1}`}
-                        onClick={() => removeMember("teamTwoMembers", index)}
-                      >
-                        Remove
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Button
-              className="create-button"
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Creating session..." : "Create session"}
-            </Button>
-          </form>
+          <SessionForm
+            submitLabel="Create session"
+            submittingLabel="Creating session..."
+            isSubmitting={isSubmitting}
+            onSubmit={(payload) =>
+              handleCreate(payload as CreateSessionRequest)
+            }
+          />
         </section>
 
         <section className="sessions-panel">
           <div className="panel-heading">
-            <span>02</span>
+            <span>04</span>
             <h2>Your sessions</h2>
           </div>
-
           {isLoading ? (
             <p className="empty-state">Loading your sessions...</p>
           ) : sessions.length === 0 ? (

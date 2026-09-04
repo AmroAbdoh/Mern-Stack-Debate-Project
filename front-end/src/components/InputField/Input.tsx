@@ -8,6 +8,7 @@ interface InputFieldProps {
   type?: "text" | "email" | "password";
   value?: string;
   placeholder?: string;
+  required?: boolean;
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   showPasswordToggle?: boolean;
 }
@@ -18,6 +19,7 @@ function InputField({
   type = "text",
   value,
   placeholder,
+  required = false,
   onChange,
   showPasswordToggle = false,
 }: InputFieldProps) {
@@ -34,6 +36,7 @@ function InputField({
           type={inputType}
           value={value}
           placeholder={placeholder}
+          required={required}
           onChange={onChange}
         />
         {type === "password" && showPasswordToggle && (

@@ -100,6 +100,130 @@
   border: 1px solid #d9e4eb;
 }
 
+.configuration-section {
+  margin-top: 8px;
+  padding-top: 24px;
+  border-top: 1px solid #d9e4eb;
+}
+
+.configuration-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.configuration-heading h3 {
+  margin: 0;
+  color: var(--secondary-color);
+  font-size: 1.05rem;
+}
+
+.configuration-heading p {
+  margin: 6px 0 0;
+  color: #8b8c89;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.configuration-heading > span {
+  color: var(--primary-color);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.settings-list {
+  margin-top: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.setting-row {
+  box-sizing: border-box;
+  min-height: 62px;
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #f5f8fa;
+  border: 1px solid #d9e4eb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.setting-row:hover,
+.setting-row:has(input:checked) {
+  background: #eef7fc;
+  border-color: var(--primary-color);
+}
+
+.setting-row > div {
+  min-width: 0;
+}
+
+.setting-row strong,
+.setting-row span {
+  display: block;
+}
+
+.setting-row strong {
+  color: var(--secondary-color);
+  font-size: 0.88rem;
+}
+
+.setting-row span {
+  margin-top: 4px;
+  color: #8b8c89;
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.setting-row input {
+  position: relative;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 24px;
+  appearance: none;
+  background: #c7d5df;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.setting-row input::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(39, 76, 119, 0.2);
+  transition: transform 160ms ease;
+}
+
+.setting-row input:checked {
+  background: var(--primary-color);
+}
+
+.setting-row input:checked::after {
+  transform: translateX(18px);
+}
+
+.setting-row input:focus-visible,
+.add-phase-button:focus-visible,
+.remove-phase-button:focus-visible {
+  outline: 3px solid rgba(96, 150, 186, 0.25);
+  outline-offset: 2px;
+}
+
 .sessions-panel {
   background: var(--secondary-color);
 }
@@ -226,6 +350,77 @@
   line-height: 1.5;
   border: 1px dashed rgba(163, 206, 241, 0.4);
   border-radius: 10px;
+}
+
+.phases-list {
+  margin-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.phase-card {
+  position: relative;
+  padding: 16px 16px 16px 52px;
+  background: #f5f8fa;
+  border: 1px solid #d9e4eb;
+  border-radius: 12px;
+}
+
+.phase-number {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: var(--secondary-color);
+  border-radius: 50%;
+}
+
+.phase-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.phase-fields > .input-field input,
+.phase-fields .select-field input,
+.phase-fields .select-field select {
+  background: #ffffff;
+}
+
+.remove-phase-button {
+  justify-self: start;
+  padding: 5px 9px;
+  color: #8b3a3a;
+  font-size: 0.76rem;
+  border: 1px solid #e6baba;
+  border-radius: 7px;
+}
+
+.remove-phase-button:hover {
+  color: #ffffff;
+  background: #8b3a3a;
+}
+
+.add-phase-button {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 12px;
+  color: var(--primary-color);
+  font-size: 0.88rem;
+  background: #eef7fc;
+  border: 1px dashed var(--primary-color);
+  border-radius: 10px;
+}
+
+.add-phase-button:hover {
+  color: var(--secondary-color);
+  background: var(--secondary-bg-color);
+  transform: none;
 }
 
 .session-list {
