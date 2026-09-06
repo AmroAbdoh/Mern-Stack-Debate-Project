@@ -245,7 +245,9 @@ function SessionControl() {
                 return (
                   <div className="vote-chart" key={phase}>
                     <div className="vote-chart-heading">
-                      <strong>{phase === "pre" ? "Pre-debate" : "Post-debate"}</strong>
+                      <strong>
+                        {phase === "pre" ? "Pre-debate" : "Post-debate"}
+                      </strong>
                       <span>{total} total votes</span>
                     </div>
                     {phaseResults.map((result) => {
@@ -259,13 +261,21 @@ function SessionControl() {
                             ? session.teams[1].name
                             : "Abstain";
                       return (
-                        <div className="vote-bar-row" key={`${phase}-${result._id.choice}`}>
+                        <div
+                          className="vote-bar-row"
+                          key={`${phase}-${result._id.choice}`}
+                        >
                           <div className="vote-bar-label">
                             <span>{label}</span>
-                            <strong>{result.count} · {percentage}%</strong>
+                            <strong>
+                              {result.count} · {percentage}%
+                            </strong>
                           </div>
                           <div className="vote-bar-track">
-                            <div className={`vote-bar vote-bar-${result._id.choice}`} style={{ width: `${percentage}%` }} />
+                            <div
+                              className={`vote-bar vote-bar-${result._id.choice}`}
+                              style={{ width: `${percentage}%` }}
+                            />
                           </div>
                         </div>
                       );

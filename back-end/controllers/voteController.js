@@ -81,7 +81,11 @@ const getVoteResults = async (req, res, next) => {
     }
 
     const results = await Vote.aggregate([
-      { $match: { session: new (require("mongoose").Types.ObjectId)(req.params.id) } },
+      {
+        $match: {
+          session: new (require("mongoose").Types.ObjectId)(req.params.id),
+        },
+      },
       {
         $group: {
           _id: { phase: "$phase", choice: "$choice" },

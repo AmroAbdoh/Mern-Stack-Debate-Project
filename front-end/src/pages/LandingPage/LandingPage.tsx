@@ -38,7 +38,9 @@ function LandingPage() {
               name="session-code"
               value={sessionCode}
               placeholder="e.g. DEB-204"
-              onChange={(event) => setSessionCode(event.target.value.toUpperCase())}
+              onChange={(event) =>
+                setSessionCode(event.target.value.toUpperCase())
+              }
             />
             <Button type="button" onClick={handleJoin}>
               Join

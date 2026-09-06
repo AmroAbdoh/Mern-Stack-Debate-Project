@@ -178,7 +178,9 @@ function JoinSession() {
                 key={`${result._id.phase}-${result._id.choice}`}
               >
                 <span>
-                  {result._id.phase === "pre" ? "Pre-debate · " : "Post-debate · "}
+                  {result._id.phase === "pre"
+                    ? "Pre-debate · "
+                    : "Post-debate · "}
                   {result._id.choice === "teamOne"
                     ? session.teams[0].name
                     : result._id.choice === "teamTwo"
@@ -186,14 +188,19 @@ function JoinSession() {
                       : "Abstain"}
                 </span>
                 <strong>
-                  {result.count} ({(() => {
+                  {result.count} (
+                  {(() => {
                     const phaseTotal = results
-                      .filter((phaseResult) => phaseResult._id.phase === result._id.phase)
+                      .filter(
+                        (phaseResult) =>
+                          phaseResult._id.phase === result._id.phase,
+                      )
                       .reduce((sum, phaseResult) => sum + phaseResult.count, 0);
                     return phaseTotal
                       ? Math.round((result.count / phaseTotal) * 100)
                       : 0;
-                  })()}%)
+                  })()}
+                  %)
                 </strong>
               </div>
             ))
