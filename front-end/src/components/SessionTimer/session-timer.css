@@ -1,5 +1,9 @@
 .session-timer {
-  padding: 22px;
+  min-height: 240px;
+  padding: 42px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   color: #ffffff;
   text-align: center;
   background: var(--secondary-color);
@@ -18,7 +22,7 @@
 .session-timer strong {
   display: block;
   margin-top: 8px;
-  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-size: clamp(4rem, 14vw, 8rem);
   line-height: 1;
   letter-spacing: 0.06em;
 }

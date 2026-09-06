@@ -1,6 +1,16 @@
 const Vote = require("../models/Vote");
 const DebateSession = require("../models/DebateSession");
 const { StatusCodes } = require("http-status-codes");
+const crypto = require("crypto");
+
+const getVoterId = (req) => {
+  if (req.user?.userId) return req.user.userId;
+
+  const token = req.headers["x-voter-token"];
+  if (!token) return null;
+
+  return crypto.createHash("sha256").update(token).digest("hex").slice(0, 24);
+};
 
 const submitVote = async (req, res, next) => {
   try {
@@ -25,6 +35,13 @@ const submitVote = async (req, res, next) => {
     }
 
     const { choice } = req.body;
+    const voterId = getVoterId(req);
+
+    if (!voterId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "A voter identity is required",
+      });
+    }
 
     if (!['teamOne', 'teamTwo', 'abstain'].includes(choice)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -34,7 +51,7 @@ const submitVote = async (req, res, next) => {
 
     const vote = await Vote.create({
       session: session._id,
-      voter: req.user.userId,
+      voter: voterId,
       phase,
       choice,
     });

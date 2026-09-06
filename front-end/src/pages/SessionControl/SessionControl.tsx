@@ -23,6 +23,7 @@ function SessionControl() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isQrOpen, setIsQrOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -124,9 +125,19 @@ function SessionControl() {
           <h1>{session.name}</h1>
           <p>{session.statement}</p>
         </div>
-        <div className="session-code-block">
-          <span>Join code</span>
-          <strong>{session.code}</strong>
+        <div className="control-header-tools">
+          <div className="session-code-block">
+            <span>Join code</span>
+            <strong>{session.code}</strong>
+            <small>{session.participantCount || 0} people joined</small>
+          </div>
+          <Button
+            className="qr-button"
+            type="button"
+            onClick={() => setIsQrOpen(true)}
+          >
+            Show QR code
+          </Button>
         </div>
       </header>
 
@@ -137,8 +148,13 @@ function SessionControl() {
           {session.status === "live" || session.status === "paused" ? (
             <SessionTimer
               endsAt={session.phaseEndsAt}
+              paused={session.status === "paused"}
               label={
-                session.activeTeam ? `${session.activeTeam} time` : "Phase time"
+                session.activeTeam === "teamOne"
+                  ? "Team 1 time"
+                  : session.activeTeam === "teamTwo"
+                    ? "Team 2 time"
+                    : "Phase time"
               }
             />
           ) : (
@@ -228,26 +244,46 @@ function SessionControl() {
           )}
         </section>
 
-        <aside className="share-panel">
-          <div className="qr-wrap">
-            <QRCodeSVG
-              value={joinUrl}
-              size={164}
-              bgColor="#ffffff"
-              fgColor="#274c77"
-            />
-          </div>
-          <p>Scan to join the debate</p>
-          <code>{joinUrl}</code>
-          <Button
-            className="copy-button"
-            variant="ghost"
-            onClick={() => void navigator.clipboard?.writeText(joinUrl)}
-          >
-            Copy join link
-          </Button>
-        </aside>
       </div>
+
+      {isQrOpen && (
+        <div
+          className="qr-modal-backdrop"
+          role="presentation"
+          onClick={() => setIsQrOpen(false)}
+        >
+          <section
+            className="qr-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="qr-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="qr-modal-close"
+              type="button"
+              aria-label="Close QR code"
+              onClick={() => setIsQrOpen(false)}
+            >
+              Close
+            </button>
+            <p className="control-eyebrow">Join this debate</p>
+            <h2 id="qr-modal-title">Scan the QR code</h2>
+            <div className="qr-modal-code">
+              <QRCodeSVG
+                value={joinUrl}
+                size={320}
+                bgColor="#ffffff"
+                fgColor="#274c77"
+              />
+            </div>
+            <strong className="qr-modal-count">
+              {session.participantCount || 0} people joined
+            </strong>
+            <code>{joinUrl}</code>
+          </section>
+        </div>
+      )}
     </PageCard>
   );
 }

@@ -47,10 +47,6 @@ export const router = createBrowserRouter([
   },
   {
     path: "/join/:code",
-    element: (
-      <RequireAuth>
-        <JoinSession />
-      </RequireAuth>
-    ),
+    element: <JoinSession />,
   },
 ]);

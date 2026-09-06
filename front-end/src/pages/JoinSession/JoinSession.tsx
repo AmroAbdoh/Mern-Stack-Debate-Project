@@ -155,10 +155,13 @@ function JoinSession() {
           <p>Please watch the screen and follow the current phase.</p>
           <SessionTimer
             endsAt={session.phaseEndsAt}
+            paused={session.status === "paused"}
             label={
-              session.activeTeam
-                ? `${session.activeTeam} speaking`
-                : "Current phase"
+              session.activeTeam === "teamOne"
+                ? "Team 1 speaking"
+                : session.activeTeam === "teamTwo"
+                  ? "Team 2 speaking"
+                  : "Current phase"
             }
           />
         </section>

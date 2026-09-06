@@ -28,6 +28,13 @@ const DebateSessionSchema = new mongoose.Schema(
       required: true,
     },
 
+    participants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
     statement: {
       type: String,
       required: true,
@@ -36,7 +43,7 @@ const DebateSessionSchema = new mongoose.Schema(
 
     format: {
       type: String,
-      enum: ["PF", "LD"],
+      enum: ["PF", "LD", "Custom"],
       required: true,
     },
 
@@ -160,7 +167,7 @@ const DebateSessionSchema = new mongoose.Schema(
 
         timingMode: {
           type: String,
-          enum: ["per-team", "shared"],
+          enum: ["per-team", "team-one", "team-two", "shared"],
           default: "per-team",
         },
 
@@ -174,6 +181,11 @@ const DebateSessionSchema = new mongoose.Schema(
   {
     timestamps: true,
   },
+);
+
+DebateSessionSchema.index(
+  { host: 1, name: 1 },
+  { unique: true, collation: { locale: "en", strength: 2 } },
 );
 
 module.exports = mongoose.model("DebateSession", DebateSessionSchema);

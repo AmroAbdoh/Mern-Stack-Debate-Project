@@ -9,7 +9,7 @@ const getOrderedPhases = (session) =>
   [...session.phases].sort((first, second) => first.order - second.order);
 
 const getPhaseDurationSeconds = (phase) =>
-  phase.durationSeconds || phase.duration * 60;
+  phase.duration * 60;
 
 const getPhaseEnd = (phase, startedAt) =>
   new Date(startedAt.getTime() + getPhaseDurationSeconds(phase) * 1000);
@@ -22,7 +22,12 @@ const startDebatePhase = (session, phaseIndex, startedAt) => {
   session.status = "live";
   session.currentPhase = "debate";
   session.currentPhaseIndex = phaseIndex;
-  session.activeTeam = phase.timingMode === "shared" ? undefined : "teamOne";
+  session.activeTeam =
+    phase.timingMode === "team-two"
+      ? "teamTwo"
+      : phase.timingMode === "shared"
+        ? undefined
+        : "teamOne";
   session.phaseStartedAt = startedAt;
   session.phaseEndsAt = getPhaseEnd(phase, startedAt);
   return true;

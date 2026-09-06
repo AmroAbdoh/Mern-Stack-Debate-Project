@@ -16,10 +16,11 @@ export type SessionStatus =
 
 export type DebateSession = {
   _id: string;
+  participantCount?: number;
   code: string;
   name: string;
   statement: string;
-  format: "PF" | "LD";
+  format: "PF" | "LD" | "Custom";
   teams: [
     { name: string; members: { name: string; contactInfo?: string }[] },
     { name: string; members: { name: string; contactInfo?: string }[] },
@@ -41,7 +42,7 @@ export type DebateSession = {
     name: string;
     duration: number;
     durationSeconds?: number;
-    timingMode: "per-team" | "shared";
+    timingMode: "per-team" | "team-one" | "team-two" | "shared";
     order: number;
   }[];
 };
@@ -49,7 +50,7 @@ export type DebateSession = {
 export type CreateSessionRequest = {
   name: string;
   statement: string;
-  format: "PF" | "LD";
+  format: "PF" | "LD" | "Custom";
 
   teams: [
     { name: string; members: { name: string }[] },
@@ -68,7 +69,7 @@ export type CreateSessionRequest = {
   phases: {
     name: string;
     duration: number;
-    timingMode: "per-team" | "shared";
+    timingMode: "per-team" | "team-one" | "team-two" | "shared";
     order: number;
   }[];
 };
@@ -80,6 +81,20 @@ export type UpdateSessionRequest = Pick<
 
 const authHeaders = () => ({
   Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+});
+
+const voterToken = () => {
+  const existing = localStorage.getItem("voterToken");
+  if (existing) return existing;
+
+  const token = crypto.randomUUID();
+  localStorage.setItem("voterToken", token);
+  return token;
+};
+
+const participationHeaders = () => ({
+  ...authHeaders(),
+  "X-Voter-Token": voterToken(),
 });
 
 export const createSession = async (payload: CreateSessionRequest) => {
@@ -101,14 +116,20 @@ export const getSessions = async () => {
 };
 
 export const getSession = async (id: string) => {
-  const response = await api.get<{ session: DebateSession }>(
+  const response = await api.get<{
+    session: DebateSession;
+    participantCount: number;
+  }>(
     `/sessions/${id}`,
     {
       headers: authHeaders(),
     },
   );
 
-  return response.data.session;
+  return {
+    ...response.data.session,
+    participantCount: response.data.participantCount,
+  };
 };
 
 export const updateSession = async (
@@ -122,6 +143,10 @@ export const updateSession = async (
   );
 
   return response.data.session;
+};
+
+export const deleteSession = async (id: string) => {
+  await api.delete(`/sessions/${id}`, { headers: authHeaders() });
 };
 
 export const updateSessionStatus = async (
@@ -157,12 +182,18 @@ export const updateSessionLifecycle = async (
 };
 
 export const getSessionByCode = async (code: string) => {
-  const response = await api.get<{ session: DebateSession }>(
+  const response = await api.get<{
+    session: DebateSession;
+    participantCount: number;
+  }>(
     `/sessions/code/${code}`,
-    { headers: authHeaders() },
+    { headers: participationHeaders() },
   );
 
-  return response.data.session;
+  return {
+    ...response.data.session,
+    participantCount: response.data.participantCount,
+  };
 };
 
 export type VoteChoice = "teamOne" | "teamTwo" | "abstain";
@@ -171,7 +202,7 @@ export const submitVote = async (id: string, choice: VoteChoice) => {
   const response = await api.post<{ message: string }>(
     `/sessions/${id}/votes`,
     { choice },
-    { headers: authHeaders() },
+    { headers: participationHeaders() },
   );
 
   return response.data;
@@ -185,7 +216,7 @@ export type VoteResult = {
 export const getVoteResults = async (id: string) => {
   const response = await api.get<{ results: VoteResult[] }>(
     `/sessions/${id}/votes/results`,
-    { headers: authHeaders() },
+    { headers: participationHeaders() },
   );
 
   return response.data.results;

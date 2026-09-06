@@ -9,18 +9,84 @@ import type {
 } from "../../services/sessionAPI";
 
 type Phase = CreateSessionRequest["phases"][number];
+type SessionFormat = CreateSessionRequest["format"];
 type FormData = Omit<CreateSessionRequest, "teams"> & {
   teams: CreateSessionRequest["teams"];
+};
+
+const formatTemplates: Record<
+  Exclude<SessionFormat, "Custom">,
+  Pick<FormData, "teams" | "phases">
+> = {
+  PF: {
+    teams: [
+      { name: "Affirmative", members: [{ name: "" }, { name: "" }] },
+      { name: "Negative", members: [{ name: "" }, { name: "" }] },
+    ],
+    phases: [
+      { name: "Constructive", duration: 4, timingMode: "per-team", order: 1 },
+      { name: "Rebuttal", duration: 4, timingMode: "per-team", order: 2 },
+      { name: "Summary", duration: 3, timingMode: "per-team", order: 3 },
+      { name: "Final Focus", duration: 2, timingMode: "per-team", order: 4 },
+    ],
+  },
+  LD: {
+    teams: [
+      { name: "Affirmative", members: [{ name: "" }] },
+      { name: "Negative", members: [{ name: "" }] },
+    ],
+    phases: [
+      {
+        name: "Affirmative Constructive",
+        duration: 6,
+        timingMode: "team-one",
+        order: 1,
+      },
+      {
+        name: "Cross-Examination",
+        duration: 3,
+        timingMode: "shared",
+        order: 2,
+      },
+      {
+        name: "Negative Constructive",
+        duration: 7,
+        timingMode: "team-two",
+        order: 3,
+      },
+      {
+        name: "Cross-Examination",
+        duration: 3,
+        timingMode: "shared",
+        order: 4,
+      },
+      {
+        name: "Affirmative Rebuttal",
+        duration: 4,
+        timingMode: "team-one",
+        order: 5,
+      },
+      {
+        name: "Negative Rebuttal",
+        duration: 6,
+        timingMode: "team-two",
+        order: 6,
+      },
+      {
+        name: "Affirmative Final Rebuttal",
+        duration: 3,
+        timingMode: "team-one",
+        order: 7,
+      },
+    ],
+  },
 };
 
 const getDefaultSessionFormData = (): FormData => ({
   name: "",
   statement: "",
   format: "PF",
-  teams: [
-    { name: "", members: [{ name: "" }] },
-    { name: "", members: [{ name: "" }] },
-  ],
+  ...formatTemplates.PF,
   startTime: "",
   settings: {
     allowAbstain: false,
@@ -28,11 +94,6 @@ const getDefaultSessionFormData = (): FormData => ({
     postDebateVoting: true,
     autoShowResults: true,
   },
-  phases: [
-    { name: "Opening", duration: 4, timingMode: "per-team", order: 1 },
-    { name: "Rebuttal", duration: 3, timingMode: "per-team", order: 2 },
-    { name: "Closing", duration: 2, timingMode: "per-team", order: 3 },
-  ],
 });
 
 const toFormData = (session?: DebateSession): FormData => {
@@ -116,7 +177,7 @@ function SessionForm({
         ...teams[teamIndex],
         members: [...teams[teamIndex].members, { name: "" }],
       };
-      return { ...current, teams };
+      return { ...current, format: "Custom", teams };
     });
   };
 
@@ -130,7 +191,7 @@ function SessionForm({
         ...teams[teamIndex],
         members: members.length ? members : [{ name: "" }],
       };
-      return { ...current, teams };
+      return { ...current, format: "Custom", teams };
     });
   };
 
@@ -141,10 +202,21 @@ function SessionForm({
   ) => {
     setFormData((current) => ({
       ...current,
+      format: "Custom",
       phases: current.phases.map((phase, phaseIndex) =>
         phaseIndex === index ? { ...phase, [field]: value } : phase,
       ),
     }));
+  };
+
+  const changeFormat = (format: SessionFormat) => {
+    setFormData((current) => {
+      if (format === "Custom") {
+        return { ...current, format };
+      }
+
+      return { ...current, format, ...formatTemplates[format] };
+    });
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -167,6 +239,7 @@ function SessionForm({
 
     const payload = {
       ...formData,
+      settings: { ...formData.settings, postDebateVoting: true },
       teams: formData.teams.map((team) => ({
         name: team.name.trim(),
         members: team.members
@@ -212,14 +285,12 @@ function SessionForm({
           <select
             value={formData.format}
             onChange={(event) =>
-              setFormData((current) => ({
-                ...current,
-                format: event.target.value as FormData["format"],
-              }))
+              changeFormat(event.target.value as SessionFormat)
             }
           >
             <option value="PF">Public Forum</option>
             <option value="LD">Lincoln-Douglas</option>
+            <option value="Custom">Custom</option>
           </select>
         </label>
         <label className="select-field">
@@ -255,14 +326,16 @@ function SessionForm({
           <div className="member-group" key={teamIndex}>
             <div className="member-heading">
               <span>Team {teamIndex + 1} members</span>
-              <Button
-                className="add-member-button"
-                variant="ghost"
-                type="button"
-                onClick={() => addMember(teamIndex as 0 | 1)}
-              >
-                + Add member
-              </Button>
+              {formData.format === "Custom" && (
+                <Button
+                  className="add-member-button"
+                  variant="ghost"
+                  type="button"
+                  onClick={() => addMember(teamIndex as 0 | 1)}
+                >
+                  + Add member
+                </Button>
+              )}
             </div>
             {formData.teams[teamIndex].members.map((member, memberIndex) => (
               <div className="member-input" key={`${teamIndex}-${memberIndex}`}>
@@ -279,18 +352,19 @@ function SessionForm({
                     )
                   }
                 />
-                {formData.teams[teamIndex].members.length > 1 && (
-                  <Button
-                    className="remove-member-button"
-                    variant="ghost"
-                    type="button"
-                    onClick={() =>
-                      removeMember(teamIndex as 0 | 1, memberIndex)
-                    }
-                  >
-                    Remove
-                  </Button>
-                )}
+                {formData.format === "Custom" &&
+                  formData.teams[teamIndex].members.length > 1 && (
+                    <Button
+                      className="remove-member-button"
+                      variant="ghost"
+                      type="button"
+                      onClick={() =>
+                        removeMember(teamIndex as 0 | 1, memberIndex)
+                      }
+                    >
+                      Remove
+                    </Button>
+                  )}
               </div>
             ))}
           </div>
@@ -311,10 +385,6 @@ function SessionForm({
             preDebateVoting: [
               "Pre-debate voting",
               "Let the audience vote before the debate.",
-            ],
-            postDebateVoting: [
-              "Post-debate voting",
-              "Let the audience vote after the debate.",
             ],
             autoShowResults: [
               "Auto-show results",
@@ -399,6 +469,8 @@ function SessionForm({
                       }
                     >
                       <option value="per-team">Per team</option>
+                      <option value="team-one">Team 1 only</option>
+                      <option value="team-two">Team 2 only</option>
                       <option value="shared">Shared</option>
                     </select>
                   </label>
@@ -411,6 +483,7 @@ function SessionForm({
                     onClick={() =>
                       setFormData((current) => ({
                         ...current,
+                        format: "Custom",
                         phases: current.phases.filter(
                           (_, phaseIndex) => phaseIndex !== index,
                         ),
@@ -431,6 +504,7 @@ function SessionForm({
           onClick={() =>
             setFormData((current) => ({
               ...current,
+              format: "Custom",
               phases: [
                 ...current.phases,
                 {

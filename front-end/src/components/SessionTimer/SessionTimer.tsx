@@ -4,13 +4,20 @@ import "./session-timer.css";
 interface SessionTimerProps {
   endsAt?: string;
   label?: string;
+  paused?: boolean;
 }
 
-function SessionTimer({ endsAt, label = "Time remaining" }: SessionTimerProps) {
+function SessionTimer({
+  endsAt,
+  label = "Time remaining",
+  paused = false,
+}: SessionTimerProps) {
   const [remaining, setRemaining] = useState(0);
 
   useEffect(() => {
     const update = () => {
+      if (paused) return;
+
       setRemaining(
         endsAt
           ? Math.max(
@@ -24,7 +31,7 @@ function SessionTimer({ endsAt, label = "Time remaining" }: SessionTimerProps) {
     update();
     const interval = window.setInterval(update, 1000);
     return () => window.clearInterval(interval);
-  }, [endsAt]);
+  }, [endsAt, paused]);
 
   const minutes = Math.floor(remaining / 60)
     .toString()

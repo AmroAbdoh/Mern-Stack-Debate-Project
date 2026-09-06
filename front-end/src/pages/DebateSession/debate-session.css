@@ -89,6 +89,16 @@
   color: var(--primary-color);
 }
 
+.edit-actions .delete-button {
+  color: #8b3a3a;
+  border-color: #e6baba;
+}
+
+.edit-actions .delete-button:hover:not(:disabled) {
+  color: #ffffff;
+  background: #8b3a3a;
+}
+
 .format-badge {
   padding: 10px 14px;
   color: var(--secondary-color);
