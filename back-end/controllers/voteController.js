@@ -22,11 +22,12 @@ const submitVote = async (req, res, next) => {
       });
     }
 
-    const phase = session.status === "pre-voting"
-      ? "pre"
-      : session.status === "post-voting"
-        ? "post"
-        : null;
+    const phase =
+      session.status === "pre-voting"
+        ? "pre"
+        : session.status === "post-voting"
+          ? "post"
+          : null;
 
     if (!phase) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -43,7 +44,7 @@ const submitVote = async (req, res, next) => {
       });
     }
 
-    if (!['teamOne', 'teamTwo', 'abstain'].includes(choice)) {
+    if (!["teamOne", "teamTwo", "abstain"].includes(choice)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message: "Choose Team One, Team Two, or Abstain",
       });
@@ -75,7 +76,12 @@ const getVoteResults = async (req, res, next) => {
   try {
     const results = await Vote.aggregate([
       { $match: { session: req.params.id } },
-      { $group: { _id: { phase: "$phase", choice: "$choice" }, count: { $sum: 1 } } },
+      {
+        $group: {
+          _id: { phase: "$phase", choice: "$choice" },
+          count: { $sum: 1 },
+        },
+      },
       { $sort: { "_id.phase": 1, "_id.choice": 1 } },
     ]);
 

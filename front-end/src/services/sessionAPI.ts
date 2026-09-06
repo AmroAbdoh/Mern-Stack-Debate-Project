@@ -76,7 +76,13 @@ export type CreateSessionRequest = {
 
 export type UpdateSessionRequest = Pick<
   CreateSessionRequest,
-  "name" | "statement" | "format" | "startTime" | "teams" | "settings" | "phases"
+  | "name"
+  | "statement"
+  | "format"
+  | "startTime"
+  | "teams"
+  | "settings"
+  | "phases"
 >;
 
 const authHeaders = () => ({
@@ -119,12 +125,9 @@ export const getSession = async (id: string) => {
   const response = await api.get<{
     session: DebateSession;
     participantCount: number;
-  }>(
-    `/sessions/${id}`,
-    {
-      headers: authHeaders(),
-    },
-  );
+  }>(`/sessions/${id}`, {
+    headers: authHeaders(),
+  });
 
   return {
     ...response.data.session,
@@ -185,10 +188,7 @@ export const getSessionByCode = async (code: string) => {
   const response = await api.get<{
     session: DebateSession;
     participantCount: number;
-  }>(
-    `/sessions/code/${code}`,
-    { headers: participationHeaders() },
-  );
+  }>(`/sessions/code/${code}`, { headers: participationHeaders() });
 
   return {
     ...response.data.session,

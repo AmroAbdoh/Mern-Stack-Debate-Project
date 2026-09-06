@@ -243,7 +243,6 @@ function SessionControl() {
             </section>
           )}
         </section>
-
       </div>
 
       {isQrOpen && (
