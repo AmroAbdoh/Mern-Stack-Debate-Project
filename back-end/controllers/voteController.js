@@ -74,8 +74,14 @@ const submitVote = async (req, res, next) => {
 
 const getVoteResults = async (req, res, next) => {
   try {
+    if (!require("mongoose").isValidObjectId(req.params.id)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Invalid debate session id",
+      });
+    }
+
     const results = await Vote.aggregate([
-      { $match: { session: req.params.id } },
+      { $match: { session: new (require("mongoose").Types.ObjectId)(req.params.id) } },
       {
         $group: {
           _id: { phase: "$phase", choice: "$choice" },

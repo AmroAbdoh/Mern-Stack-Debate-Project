@@ -2,14 +2,16 @@ import "./auth.css";
 import PageCard from "../../components/PageCard/PageCard";
 import InputField from "../../components/InputField/Input";
 import Button from "../../components/Button/Button";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 function LandingPage() {
   const navigate = useNavigate();
+  const [sessionCode, setSessionCode] = useState("");
 
   const handleJoin = () => {
-    navigate(localStorage.getItem("token") ? "/home" : "/auth");
+    const normalizedCode = sessionCode.trim();
+    if (normalizedCode) navigate(`/join/${encodeURIComponent(normalizedCode)}`);
   };
 
   return (
@@ -34,7 +36,9 @@ function LandingPage() {
             <InputField
               label="Session code"
               name="session-code"
+              value={sessionCode}
               placeholder="e.g. DEB-204"
+              onChange={(event) => setSessionCode(event.target.value.toUpperCase())}
             />
             <Button type="button" onClick={handleJoin}>
               Join

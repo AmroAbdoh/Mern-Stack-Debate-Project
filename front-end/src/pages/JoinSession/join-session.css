@@ -139,6 +139,7 @@
 }
 .participant-result strong {
   color: var(--secondary-color);
+  white-space: nowrap;
 }
 .join-teams {
   margin-top: 24px;

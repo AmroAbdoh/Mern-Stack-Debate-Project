@@ -109,6 +109,16 @@ function SessionControl() {
   const joinUrl = `${window.location.origin}/join/${session.code}`;
   const isVoting =
     session.status === "pre-voting" || session.status === "post-voting";
+  const showResults = isVoting || session.status === "finished";
+  const resultPhases = ["pre", "post"].filter((phase) =>
+    results.some((result) => result._id.phase === phase),
+  ) as Array<"pre" | "post">;
+
+  const getPhaseResults = (phase: "pre" | "post") => {
+    const phaseResults = results.filter((result) => result._id.phase === phase);
+    const total = phaseResults.reduce((sum, result) => sum + result.count, 0);
+    return { phaseResults, total };
+  };
 
   return (
     <PageCard className="control-page">
@@ -226,20 +236,43 @@ function SessionControl() {
             )}
           </div>
 
-          {isVoting && results.length > 0 && (
+          {showResults && (
             <section className="results-panel">
               <p className="control-eyebrow">Live vote count</p>
-              {results.map((result) => (
-                <div
-                  className="result-row"
-                  key={`${result._id.phase}-${result._id.choice}`}
-                >
-                  <span>
-                    {result._id.phase} · {result._id.choice}
-                  </span>
-                  <strong>{result.count}</strong>
-                </div>
-              ))}
+              {results.length === 0 && <p>No votes have been recorded yet.</p>}
+              {resultPhases.map((phase) => {
+                const { phaseResults, total } = getPhaseResults(phase);
+                return (
+                  <div className="vote-chart" key={phase}>
+                    <div className="vote-chart-heading">
+                      <strong>{phase === "pre" ? "Pre-debate" : "Post-debate"}</strong>
+                      <span>{total} total votes</span>
+                    </div>
+                    {phaseResults.map((result) => {
+                      const percentage = total
+                        ? Math.round((result.count / total) * 100)
+                        : 0;
+                      const label =
+                        result._id.choice === "teamOne"
+                          ? session.teams[0].name
+                          : result._id.choice === "teamTwo"
+                            ? session.teams[1].name
+                            : "Abstain";
+                      return (
+                        <div className="vote-bar-row" key={`${phase}-${result._id.choice}`}>
+                          <div className="vote-bar-label">
+                            <span>{label}</span>
+                            <strong>{result.count} · {percentage}%</strong>
+                          </div>
+                          <div className="vote-bar-track">
+                            <div className={`vote-bar vote-bar-${result._id.choice}`} style={{ width: `${percentage}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
             </section>
           )}
         </section>
