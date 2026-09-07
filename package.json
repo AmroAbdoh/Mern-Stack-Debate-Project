@@ -1,0 +1,17 @@
+{
+  "name": "debate-room",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A full-stack debate session and voting application.",
+  "scripts": {
+    "dev": "concurrently -k -n backend,frontend -c blue,green \"npm run dev --prefix back-end\" \"npm run dev --prefix front-end\"",
+    "install:all": "npm install --prefix back-end && npm install --prefix front-end",
+    "build": "npm run build --prefix front-end",
+    "lint": "npm run lint --prefix front-end",
+    "start:backend": "npm start --prefix back-end",
+    "preview": "npm run preview --prefix front-end"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
