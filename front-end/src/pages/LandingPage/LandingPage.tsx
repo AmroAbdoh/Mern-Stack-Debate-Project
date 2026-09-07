@@ -37,7 +37,7 @@ function LandingPage() {
               label="Session code"
               name="session-code"
               value={sessionCode}
-              placeholder="Enter Room Code"
+              placeholder="Enter Session Code"
               onChange={(event) =>
                 setSessionCode(event.target.value.toUpperCase())
               }
